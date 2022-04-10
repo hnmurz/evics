@@ -1,4 +1,5 @@
 ;; EVICS
+;; - Implement "%"
 ;; - Make a special keybinding for "(" to enclose brackets around next sexp
 ;; - When looking at a directory file, return doesnt open the file
 ;; - BUG: Mark like at top of file "G" then paste, seems to cut out the first line
@@ -34,13 +35,9 @@
   we enable when selecting rectangles in rectangle-mark-mode")
 (make-variable-buffer-local 'evics-visual-block-callback)
 
-(defvar evics-special-mode nil
-    "For some reason special-mode does not define it's own
-  variable. So we will set one.")
-
-(defvar evics-Info-mode nil
-  "For some reason Info-mode does not define it's own
-  variable. So we will set one.")
+(defvar evics-use-mini-mode nil
+  "Use our mini keybindings to reduce keybinding cloberring in
+  specific modes.")
 
 ;; See example: evil-redirect-digit-argument
 ;; also see:    https://stackoverflow.com/questions/29956644/elisp-defmacro-with-lambda
@@ -97,19 +94,14 @@ else it will call cb2"
 (require 'evics-insert)
 (require 'evics-visual)
 
-(defun evics-special-hook ()
-  "This function sets evics-special-mode, which puts special mode
-keybindings before evics bindings"
-  (interactive)
-  (setq-local evics-special-mode (not evics-special-mode)))
-(add-hook 'special-mode-hook 'evics-special-hook)
-
-(defun evics-Info-hook ()
-  "This function sets evics-Info-mode, which puts Info mode
-keybindings before evics bindings"
-  (interactive)
-  (setq-local evics-Info-mode (not evics-Info-mode)))
-(add-hook 'Info-mode-hook 'evics-Info-hook)
+(defun evics-disable-all-modes ()
+  "Disable all evics modes. This is used for specific
+scenearios (help buffers etc), so we don't clobber keybindings
+for other minor modes."
+  (evics-normal-mode -1)
+  (evics-visual-mode -1)
+  (evics-insert-mode -1)
+  (setq cursor-type 'box))
 
 (defun evics-visual-pre-command ()
   "Check the current position vs evics--region-position and move
@@ -140,9 +132,9 @@ keybindings before evics bindings"
   "Adding a overriding map to current mode to prevent it from
 clobbering basic movement commands"
   (add-to-list 'minor-mode-overriding-map-alist
-               (cons var evics-mini-normal-mode-map)))
-(evics-mini-mode-override 'evics-special-mode)
-(evics-mini-mode-override 'evics-Info-mode)
+               (cons 'evics-use-mini-mode evics-mini-normal-mode-map)))
+;;(evics-mini-mode-override 'evics-special-mode)
+;;(evics-mini-mode-override 'evics-Info-mode)
 
 (defun evics-enable-normal-mode ()
   "Function that will determine if we want to enable evics"
@@ -180,5 +172,14 @@ clobbering basic movement commands"
       (setq evics-visual-block-callback nil))))
 (define-key rectangle-mark-mode-map (kbd "I") 'string-insert-rectangle)
 (add-hook 'rectangle-mark-mode-hook 'evics-toggle-transient-rectangle-map)
+
+;; These modes operate on read only buffers, as such, we don't want to
+;; clobber their keybindings, so we try and use a minimalist evics
+;; keymap that will just have navigation commands enabled. This
+;; approach seems a little more pragmatic than dealing with keymap
+;; priority.
+(add-hook 'special-mode-hook 'evics-mini-mode)
+(add-hook 'Info-mode-hook 'evics-mini-mode)
+(add-hook 'compilation-mode-hook 'evics-mini-mode)
 
 (provide 'evics)

@@ -328,7 +328,7 @@ in evics-command-mode-map"
     map)
   "Evics normal mode keymap")
 
-(defvar evics-mini-normal-mode-map
+(defvar evics-mini-mode-map
   (let ((map (make-keymap)))
     (suppress-keymap map)
     (define-key map ":" 'evics-command)
@@ -353,14 +353,6 @@ in evics-command-mode-map"
     map)
   "Minimal keymap for navigation. This is used to override
   special modes keybindings.")
-
-(defun evics-help-mode-override ()
-  "Adding a overriding map to help mode to prevent it from
-clobbering basic movement commands"
-  (add-to-list 'minor-mode-overriding-map-alist
-               '((evics-normal-mode evics-mini-normal-mode-map))))
-(add-hook 'help-mode-hook 'evics-help-mode-override)
-(remove-hook 'help-mode-hook 'evics-help-mode-override)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;             commands              ;;;;;;;;;;;;;;
@@ -394,5 +386,17 @@ clobbering basic movement commands"
   :keymap evics-normal-mode-map
   :group 'evics-normal
   (setq cursor-type 'box))
+
+(define-minor-mode evics-mini-mode
+  "Toggle evics normal mode."
+  :init-value nil
+  ;; The indicator for the mode line.
+  :lighter " <N>"
+  ;; The minor mode bindings.
+  :keymap evics-mini-mode-map
+  :group 'evics-mini
+  (evics-disable-all-modes)
+  (setq cursor-type 'box))
+
 
 (provide 'evics-normal)
