@@ -1,5 +1,5 @@
 ;; EVICS
-;; - Implement "%"
+;; - Investigate keybindings prio in vc-diffxOB
 ;; - Make a special keybinding for "(" to enclose brackets around next sexp
 ;; - When looking at a directory file, return doesnt open the file
 ;; - BUG: Mark like at top of file "G" then paste, seems to cut out the first line
@@ -97,10 +97,10 @@ action after timeout"
            (sit-for 0.1))
       [escape] map))
 
-(defun evics-init-esc ()
+(defun evics-init-esc (&optional frame)
   "If we are in tty then we will have to translate \\e to escape
 under certain conditions. This is taken from viper mode."
-  (when (terminal-live-p (frame-terminal))
+  (when (terminal-live-p (frame-terminal frame))
     (let ((default-esc (lookup-key input-decode-map [?\e])))
       (define-key input-decode-map [?\e] `(menu-item "" ,default-esc :filter evics-esc)))))
 
@@ -141,14 +141,6 @@ for other minor modes."
                  (call-interactively 'evics-select-line)
                  (forward-line -1)))))))
 (add-hook 'post-command-hook 'evics-visual-post-command)
-
-(defun evics-mini-mode-override (var)
-  "Adding a overriding map to current mode to prevent it from
-clobbering basic movement commands"
-  (add-to-list 'minor-mode-overriding-map-alist
-               (cons 'evics-use-mini-mode evics-mini-normal-mode-map)))
-;;(evics-mini-mode-override 'evics-special-mode)
-;;(evics-mini-mode-override 'evics-Info-mode)
 
 (defun evics-enable-normal-mode ()
   "Function that will determine if we want to enable evics"
@@ -196,5 +188,8 @@ clobbering basic movement commands"
 (add-hook 'special-mode-hook 'evics-mini-mode)
 (add-hook 'Info-mode-hook 'evics-mini-mode)
 (add-hook 'compilation-mode-hook 'evics-mini-mode)
+;; This does not seem to work.. for now I init the escape key
+;; conditionaliy when entering evics normal mode
+;; (add-to-list 'after-make-frame-functions #'evics-init-esc)
 
 (provide 'evics)

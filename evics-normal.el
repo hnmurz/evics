@@ -16,6 +16,21 @@
   (exchange-point-and-mark)
   (message "-- INSERT --"))
 
+;; If you are curious about how this works, read about "Syntax Table
+;; Internals" in the emacs manual
+(defun evics-goto-matching-paren ()
+  "Go to the matching paren, in this case meaning end or
+beginning of sexp"
+  (interactive)
+  (let ((pos (point)))
+    (cond ((eq (syntax-class (syntax-after pos)) 4)
+           (forward-sexp))
+          ((eq (syntax-class (syntax-after (- pos 1))) 5)
+           (backward-sexp))
+          ((eq (syntax-class (syntax-after pos)) 5)
+           (right-char)
+           (backward-sexp)))))
+
 (defun evics-kill-ring-save ()
   "Call kill ring save and force us out of visual mode"
   (interactive)
@@ -235,6 +250,7 @@ in evics-command-mode-map"
     
     (define-key map "@" 'jump-to-register)
     (define-key map "$" 'move-end-of-line)
+    (define-key map "%" 'evics-goto-matching-paren)
     (define-key map "/" 'isearch-forward)
     (define-key map "?" 'isearch-backward)
     (define-key map "_" 'beginning-of-line-text)
@@ -331,6 +347,7 @@ in evics-command-mode-map"
     (define-key map "j" 'next-line)
     (define-key map "k" 'previous-line)
     (define-key map "l" 'right-char)
+    (define-key map "y" 'evics-kill-ring-save)
     (define-key map "v" 'set-mark-command)
     (define-key map "V" 'evics-select-line)
     (define-key map (kbd "C-f") 'scroll-up-command)
@@ -371,7 +388,8 @@ in evics-command-mode-map"
   ;; The minor mode bindings.
   :keymap evics-normal-mode-map
   :group 'evics-normal
-  (setq cursor-type 'box))
+  (setq cursor-type 'box)
+  (evics-init-esc))
 
 (define-minor-mode evics-mini-mode
   "Toggle evics normal mode."
