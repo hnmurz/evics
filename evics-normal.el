@@ -164,20 +164,6 @@ anzu installed. If not then invoke regexp-replace"
   (cond ((require 'visual-regexp nil t) (call-interactively 'vr/replace))
         (t (call-interactively 'replace-regexp))))
 
-(defun evics-esc (map)
-  "Catch \\e on TTY and translate to escape if there is no other
-action after timeout"
-  (if (and (equal (this-single-command-keys) [?\e])
-           (sit-for 0.1))
-      [escape] map))
-
-(defun evics-init-esc ()
-  "If we are in tty then we will have to translate \\e to escape
-under certain conditions. This is taken from viper mode."
-  (when (terminal-live-p (frame-terminal))
-    (let ((default-esc (lookup-key input-decode-map [?\e])))
-      (define-key input-decode-map [?\e] `(menu-item "" ,default-esc :filter evics-esc)))))
-
 (defun evics-toggle-kbd-macro ()
   "Start or end kbd macro recording."
   (interactive)

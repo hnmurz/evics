@@ -90,6 +90,20 @@ else it will call cb2"
   (forward-line -1)
   (evics-visual-mode 1))
 
+(defun evics-esc (map)
+  "Catch \\e on TTY and translate to escape if there is no other
+action after timeout"
+  (if (and (equal (this-single-command-keys) [?\e])
+           (sit-for 0.1))
+      [escape] map))
+
+(defun evics-init-esc ()
+  "If we are in tty then we will have to translate \\e to escape
+under certain conditions. This is taken from viper mode."
+  (when (terminal-live-p (frame-terminal))
+    (let ((default-esc (lookup-key input-decode-map [?\e])))
+      (define-key input-decode-map [?\e] `(menu-item "" ,default-esc :filter evics-esc)))))
+
 (require 'evics-normal)
 (require 'evics-insert)
 (require 'evics-visual)
@@ -141,6 +155,7 @@ clobbering basic movement commands"
   (if (not (minibufferp (current-buffer)))
       (evics-normal-mode 1)))
 (define-globalized-minor-mode evics-global-mode evics-normal-mode evics-enable-normal-mode)
+(evics-init-esc)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Non evics related config
