@@ -259,7 +259,7 @@ in evics-command-mode-map"
     (define-key map (kbd "<escape>") 'keyboard-quit)
     (define-key map ":" 'evics-command)
     (define-key map ";" 'ignore)
-    (define-key map "," 'jump-to-register)
+    (define-key map "'" 'jump-to-register)
     (define-key map "=" 'indent-region)
 
     ;; If 0 is pressed without any other digit args before it, then we
@@ -404,3 +404,4 @@ in evics-command-mode-map"
 
 
 (provide 'evics-normal)
+

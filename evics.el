@@ -1,16 +1,13 @@
 ;; EVICS
-;; - Investigate keybindings prio in vc-diffxOB
+;; - Doesnt work well in fundamental mode.
+;; - Investigate keybindings prio in vc-diff
 ;; - Make a special keybinding for "(" to enclose brackets around next sexp
 ;; - When looking at a directory file, return doesnt open the file
-;; - BUG: Mark like at top of file "G" then paste, seems to cut out the first line
 ;; - Make yank (pasting) more like vim
 ;; - Probably have to change evics-command-mode-map to be an alist instead of keymap to handle
 ;; string arguments
 ;; - Show current mode on modeline
-;; - highlight under cursor when marking region
-;; - maybe use previous-logical-line
 ;; - For regex replace, see if we can do global replace i.e. s/<pat>/<pat>/g
-;; - Record kbd macros with q (see keyboard macro registers in manual)
 ;; - Make evics commands handle prefix values
 ;;
 
@@ -116,31 +113,6 @@ for other minor modes."
   (evics-visual-mode -1)
   (evics-insert-mode -1)
   (setq cursor-type 'box))
-
-(defun evics-visual-pre-command ()
-  "Check the current position vs evics--region-position and move
-  mark accordingly to emulate vim line mode highlighting"
-  (setq evics--previous-line-number (line-number-at-pos)))
-(add-hook 'pre-command-hook 'evics-visual-pre-command)
-
-(defun evics-visual-post-command ()
-  "Check the current position vs evics--region-position and move
-  mark accordingly to emulate vim line mode highlighting"
-  (if (and (boundp evics-visual-mode)
-           evics-visual-mode)
-      (let ((line-number (line-number-at-pos)))
-        (cond ((and (<= evics--previous-line-number line-number)
-                    (= (+ 1 evics--region-position) line-number))
-               (progn
-                 (goto-line evics--region-position)
-                 (set-mark (point))
-                 (goto-line (+ 1 line-number))))
-              ((and (= evics--region-position line-number)
-                    (> evics--previous-line-number evics--region-position))
-               (progn
-                 (call-interactively 'evics-select-line)
-                 (forward-line -1)))))))
-(add-hook 'post-command-hook 'evics-visual-post-command)
 
 (defun evics-enable-normal-mode ()
   "Function that will determine if we want to enable evics"
