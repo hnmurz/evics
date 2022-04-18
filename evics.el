@@ -1,6 +1,11 @@
 ;; EVICS
-;; - Doesnt work well in fundamental mode.
-;; - Investigate keybindings prio in vc-diff
+;; - Add logic to push mark before calling anything in evics-visual-transient-mode-map
+;; Afterwards we can restore the mark.
+;; - "q" doesnt work in backtrace buffer for debug on error
+;; - Move evics-visual-transient to use overriding map alist instead of transient,
+;; key off evics-normal mode so we dont clobber minibuffer
+;; - Investigate keybindings prio in vc-diff, might be related to ordering of minor-mode-map-alist
+;;   See https://emacs.stackexchange.com/questions/13447/how-to-set-a-rule-for-the-order-of-minor-mode-map-alist
 ;; - Make a special keybinding for "(" to enclose brackets around next sexp
 ;; - When looking at a directory file, return doesnt open the file
 ;; - Make yank (pasting) more like vim
@@ -72,7 +77,11 @@ else it will call cb2"
   (evics-insert-mode -1)
   (evics-visual-mode -1)
   (evics-normal-mode t)
+  ;; We dont want to leave blank lines with whitespace.
   (evics-left-char-same-line)
+  (save-excursion
+    (move-beginning-of-line nil)
+    (evics--kill-line-or-whitespace t))
   ;; (keyboard-quit) ;; For now keep this disabled... seems to clobber the message call below
   (message "-- NORMAL --"))
 
@@ -160,6 +169,9 @@ for other minor modes."
 (add-hook 'special-mode-hook 'evics-mini-mode)
 (add-hook 'Info-mode-hook 'evics-mini-mode)
 (add-hook 'compilation-mode-hook 'evics-mini-mode)
+(add-hook 'diff-mode-hook 'evics-mini-mode)
+(add-hook 'debugger-mode-hook 'evics-mini-mode)
+(add-hook 'messages-buffer-mode-hook 'evics-mini-mode)
 ;; This does not seem to work.. for now I init the escape key
 ;; conditionaliy when entering evics normal mode
 ;; (add-to-list 'after-make-frame-functions #'evics-init-esc)

@@ -37,3 +37,6 @@ following elisp snippet:
      (add-to-list 'load-path "<PATH TO EVICS>")
      (require 'evics)
      (evics-global-mode t)
+
+You will most likely want to install undo-tree. Atleast until evics is
+reworked to use emacs 28's built in undo-redo.

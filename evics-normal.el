@@ -31,6 +31,18 @@ beginning of sexp"
            (right-char)
            (backward-sexp)))))
 
+(defun evics-scroll-up-line ()
+  "DOCSTRING"
+  (interactive)
+  (let ((scroll-preserve-screen-position t))
+    (scroll-up 1)))
+
+(defun evics-scroll-down-line ()
+  "DOCSTRING"
+  (interactive)
+  (let ((scroll-preserve-screen-position t))
+    (scroll-down 1)))
+
 (defun evics-kill-ring-save ()
   "Call kill ring save and force us out of visual mode"
   (interactive)
@@ -111,19 +123,36 @@ forward op. So this method uses a makeshift forward op."
   (kill-word 1)
   (evics-goto-insert-mode))
 
-(defun evics--kill-line-or-whitespace ()
+(defun evics-middle-of-screen ()
+  "DOCSTRING"
+  (interactive)
+  (move-to-window-line 'nil))
+
+(defun evics-bottom-of-screen ()
+  "DOCSTRING"
+  (interactive)
+  (move-to-window-line -1))
+
+(defun evics-top-of-screen ()
+  "DOCSTRING"
+  (interactive)
+  (move-to-window-line 0))
+
+(defun evics--kill-line-or-whitespace (&optional dont-kill)
   "Kill-line functionality that does not kill through the
 newline."
   (if (looking-at-p "[[:blank:]]*$")
       (progn (re-search-forward "[[:blank:]]*")
              (replace-match ""))
-    (kill-line)))
+    (if (not dont-kill)
+        (kill-line))))
 
 (defun evics-kill-whole-line-insert ()
   "Kill line of text"
   (interactive)
   (move-beginning-of-line nil)
   (evics--kill-line-or-whitespace)
+  (funcall indent-line-function)
   (evics-goto-insert-mode))
 
 (defun evics-kill-line-insert ()
@@ -292,7 +321,7 @@ in evics-command-mode-map"
     (define-key map (kbd "g g") 'beginning-of-buffer)
     (evics-key-prefix-argument-overload map "G" 'goto-line 'end-of-buffer)
     (define-key map "h" 'left-char)
-    (define-key map "H" 'backward-list)
+    (define-key map "H" 'evics-top-of-screen)
     (define-key map "i" 'evics-goto-insert-mode)
     (define-key map "I" 'evics-goto-Insert-mode)
     (define-key map "j" 'next-line)
@@ -300,9 +329,9 @@ in evics-command-mode-map"
     (define-key map "k" 'previous-line)
     (define-key map "K" 'backward-up-list)
     (define-key map "l" 'right-char)
-    (define-key map "L" 'forward-list)
+    (define-key map "L" 'evics-bottom-of-screen)
     (define-key map "m" 'point-to-register)
-    (define-key map "M" (lambda () (interactive)(print (current-minor-mode-maps))))
+    (define-key map "M" 'evics-middle-of-screen)
     (define-key map "n" 'isearch-repeat-forward)
     (define-key map "N" 'isearch-repeat-backward)
     (define-key map "o" 'evics-newline-below)
@@ -350,8 +379,10 @@ in evics-command-mode-map"
     (define-key map "y" 'evics-kill-ring-save)
     (define-key map "v" 'set-mark-command)
     (define-key map "V" 'evics-select-line)
-    (define-key map (kbd "C-f") 'scroll-up-command)
     (define-key map (kbd "C-b") 'scroll-down-command)
+    (define-key map (kbd "C-e") 'evics-scroll-up-line)
+    (define-key map (kbd "C-f") 'scroll-up-command)
+    (define-key map (kbd "C-y") 'evics-scroll-down-line)
     (define-key map (kbd "<escape>") 'keyboard-quit)
     map)
   "Minimal keymap for navigation. This is used to override
@@ -370,6 +401,8 @@ in evics-command-mode-map"
         ("vsplit" split-window-right)
         ("split" split-window-below)
         ("s" evics-regex-replace)))
+
+;; To remove
 (defvar evics-command-mode-map (make-sparse-keymap) "Evics command mode keymap")
 (define-key evics-command-mode-map (kbd "w") 'save-buffer)
 (define-key evics-command-mode-map (kbd "W") 'save-buffer)
