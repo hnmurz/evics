@@ -1,9 +1,10 @@
 ;; EVICS
+;; - Move evics-visual-transient to use overriding map alist instead of transient,
+;; key off evics-normal mode so we dont clobber minibuffer
+;; - When pasting over region, mark remains set afterwards
 ;; - Add logic to push mark before calling anything in evics-visual-transient-mode-map
 ;; Afterwards we can restore the mark.
 ;; - "q" doesnt work in backtrace buffer for debug on error
-;; - Move evics-visual-transient to use overriding map alist instead of transient,
-;; key off evics-normal mode so we dont clobber minibuffer
 ;; - Investigate keybindings prio in vc-diff, might be related to ordering of minor-mode-map-alist
 ;;   See https://emacs.stackexchange.com/questions/13447/how-to-set-a-rule-for-the-order-of-minor-mode-map-alist
 ;; - Make a special keybinding for "(" to enclose brackets around next sexp
@@ -158,7 +159,7 @@ for other minor modes."
     (when evics-visual-block-callback
       (funcall evics-visual-block-callback)
       (setq evics-visual-block-callback nil))))
-(define-key rectangle-mark-mode-map (kbd "I") 'string-insert-rectangle)
+(define-key rectangle-mark-mode-map (kbd "I") 'string-rectangle)
 (add-hook 'rectangle-mark-mode-hook 'evics-toggle-transient-rectangle-map)
 
 ;; These modes operate on read only buffers, as such, we don't want to
@@ -172,6 +173,8 @@ for other minor modes."
 (add-hook 'diff-mode-hook 'evics-mini-mode)
 (add-hook 'debugger-mode-hook 'evics-mini-mode)
 (add-hook 'messages-buffer-mode-hook 'evics-mini-mode)
+;; (add-hook 'vc-annotate-mode-hook 'evics-mini-mode)
+
 ;; This does not seem to work.. for now I init the escape key
 ;; conditionaliy when entering evics normal mode
 ;; (add-to-list 'after-make-frame-functions #'evics-init-esc)
