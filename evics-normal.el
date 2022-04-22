@@ -428,7 +428,7 @@ in evics-command-mode-map"
   "Toggle evics normal mode."
   :init-value nil
   ;; The indicator for the mode line.
-  :lighter " <N>"
+  :lighter " <M>"
   ;; The minor mode bindings.
   :keymap evics-mini-mode-map
   :group 'evics-mini

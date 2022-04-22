@@ -1,6 +1,7 @@
 ;; EVICS
 ;; - Move evics-visual-transient to use overriding map alist instead of transient,
-;; key off evics-normal mode so we dont clobber minibuffer
+;; key off evics-normal mode so we dont clobber minibuffer. Look at how viper mode uses
+;; the emulation-mode-map-alist
 ;; - When pasting over region, mark remains set afterwards
 ;; - Add logic to push mark before calling anything in evics-visual-transient-mode-map
 ;; Afterwards we can restore the mark.
