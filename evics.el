@@ -1,8 +1,5 @@
 ;; EVICS
-;; - Move evics-visual-transient to use overriding map alist instead of transient,
-;; key off evics-normal mode so we dont clobber minibuffer. Look at how viper mode uses
-;; the emulation-mode-map-alist
-;; - When pasting over region, mark remains set afterwards
+;; - When pasting over region, mark remains set afterwards, look into fixing evics-yank
 ;; - Add logic to push mark before calling anything in evics-visual-transient-mode-map
 ;; Afterwards we can restore the mark.
 ;; - "q" doesnt work in backtrace buffer for debug on error
@@ -179,5 +176,16 @@ for other minor modes."
 ;; This does not seem to work.. for now I init the escape key
 ;; conditionaliy when entering evics normal mode
 ;; (add-to-list 'after-make-frame-functions #'evics-init-esc)
+
+(defvar evics--emulation-maps
+  (list
+   (cons 'rectangle-mark-mode rectangle-mark-mode-map)
+   (cons 'mark-active evics-mark-active-mode-map)
+   (cons 'evics-mini-mode evics-mini-mode-map)
+   (cons 'evics-normal-mode evics-normal-mode-map)
+   (cons 'evics-insert-mode evics-insert-mode-map))
+  "List of keymaps that evics is using. The order of the keymaps
+  is important since it sets the precendence.")
+(add-to-list 'emulation-mode-map-alists 'evics--emulation-maps)
 
 (provide 'evics)

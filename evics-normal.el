@@ -8,6 +8,17 @@
   (evics-insert-mode t)
   (message "-- INSERT --"))
 
+(defun evics-yank ()
+  "We have to disable evics-visual-mode here. We can't use the
+deactivate-mark-hook since this will be called after the mark is
+disabled which seems to happen after post-command-hook. So
+post-command-hook will move the cursor."
+  (interactive)
+  ;; Note: We have delete-selection-mode enabled.
+  (call-interactively 'yank)
+  )
+  ;; (evics-normal-mode t))
+
 (defun evics-goto-Insert-mode ()
   "Switch from whatever evics mode to insert"
   (interactive)
@@ -273,92 +284,6 @@ in evics-command-mode-map"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'rect)
-(defvar evics-normal-mode-map
-  (let ((map (make-keymap)))
-    (suppress-keymap map)
-    
-    (define-key map "@" 'jump-to-register)
-    (define-key map "$" 'move-end-of-line)
-    (define-key map "%" 'evics-goto-matching-paren)
-    (define-key map "/" 'isearch-forward)
-    (define-key map "?" 'isearch-backward)
-    (define-key map "_" 'beginning-of-line-text)
-    ;; Kind of a cheat to bind this to keyboard-quit instead of
-    ;; keyboard escape quit.
-    (define-key map (kbd "<escape>") 'keyboard-quit)
-    (define-key map ":" 'evics-command)
-    (define-key map ";" 'ignore)
-    (define-key map "'" 'jump-to-register)
-    (define-key map "=" 'indent-region)
-
-    ;; If 0 is pressed without any other digit args before it, then we
-    ;; goto the beginning of the line.
-    (evics-key-prefix-argument-overload map "0" 'digit-argument 'move-beginning-of-line)
-    (define-key map "1" 'digit-argument)
-    (define-key map "2" 'digit-argument)
-    (define-key map "3" 'digit-argument)
-    (define-key map "4" 'digit-argument)
-    (define-key map "5" 'digit-argument)
-    (define-key map "6" 'digit-argument)
-    (define-key map "7" 'digit-argument)
-    (define-key map "8" 'digit-argument)
-    (define-key map "9" 'digit-argument)
-
-    (define-key map "a" 'evics-append)
-    (define-key map "A" 'evics-append-line)
-    (define-key map "b" 'backward-word)
-    (define-key map "B" 'evics-backward-WORD)
-    (define-key map (kbd "c i w") 'evics-kill-whole-word-insert)
-    (define-key map (kbd "c w") 'evics-kill-word-insert)
-    (define-key map (kbd "c c") 'evics-kill-whole-line-insert)
-    (define-key map "C" 'evics-kill-line-insert)
-    (define-key map (kbd "d w") 'evics-kill-whole-word)
-    (define-key map (kbd "d w") 'kill-word)
-    (define-key map (kbd "d d") 'evics-kill-whole-line)
-    (define-key map "D" 'kill-line)
-    (define-key map "e" 'forward-word)
-    (define-key map "E" 'evics-forward-WORD)
-    (define-key map (kbd "g g") 'beginning-of-buffer)
-    (evics-key-prefix-argument-overload map "G" 'goto-line 'end-of-buffer)
-    (define-key map "h" 'left-char)
-    (define-key map "H" 'evics-top-of-screen)
-    (define-key map "i" 'evics-goto-insert-mode)
-    (define-key map "I" 'evics-goto-Insert-mode)
-    (define-key map "j" 'next-line)
-    (define-key map "J" 'down-list)
-    (define-key map "k" 'previous-line)
-    (define-key map "K" 'backward-up-list)
-    (define-key map "l" 'right-char)
-    (define-key map "L" 'evics-bottom-of-screen)
-    (define-key map "m" 'point-to-register)
-    (define-key map "M" 'evics-middle-of-screen)
-    (define-key map "n" 'isearch-repeat-forward)
-    (define-key map "N" 'isearch-repeat-backward)
-    (define-key map "o" 'evics-newline-below)
-    (define-key map "O" 'evics-newline-above)
-    (define-key map "p" 'yank) ; Note: We have delete-selection-mode enabled.
-    (define-key map "P" 'yank) ; Note: We have delete-selection-mode enabled.
-    (define-key map "q" 'evics-toggle-kbd-macro)
-    (define-key map "r" 'evics-replace-char)
-    (define-key map "u" 'undo)
-    (define-key map "v" 'set-mark-command)
-    (define-key map "V" 'evics-select-line)
-    (define-key map "x" 'delete-forward-char)
-    (define-key map "y" 'evics-kill-ring-save)
-    (define-key map "z" 'eval-defun)
-
-    ;; Will need to remove undo-tree dependency in the future
-    (define-key map (kbd "C-f") 'scroll-up-command)
-    (define-key map (kbd "C-j") 'evics-join-line)
-    (define-key map (kbd "C-r") 'evics-redo)
-    (define-key map (kbd "C-v") 'rectangle-mark-mode)
-    (define-key map (kbd "C-=") 'align)
-    (define-key map (kbd "C-b") 'scroll-down-command)
-    (define-key map (kbd "DEL") 'left-char)
-    (define-key map (kbd "RET") 'isearch-exit)
-    map)
-  "Evics normal mode keymap")
-
 (defvar evics-mini-mode-map
   (let ((map (make-keymap)))
     (suppress-keymap map)
@@ -384,9 +309,80 @@ in evics-command-mode-map"
     (define-key map (kbd "C-f") 'scroll-up-command)
     (define-key map (kbd "C-y") 'evics-scroll-down-line)
     (define-key map (kbd "<escape>") 'keyboard-quit)
+    (define-key map (kbd "<down-mouse-1>") 'push-button)
+    (define-key map (kbd "<drag-mouse-1>") 'nil)
     map)
   "Minimal keymap for navigation. This is used to override
   special modes keybindings.")
+
+(defvar evics-normal-mode-map
+  (let ((map (make-keymap)))
+    (suppress-keymap map)
+    (set-keymap-parent map evics-mini-mode-map)
+    
+    (define-key map "@" 'jump-to-register)
+    (define-key map "%" 'evics-goto-matching-paren)
+    (define-key map "_" 'beginning-of-line-text)
+    ;; Kind of a cheat to bind this to keyboard-quit instead of
+    ;; keyboard escape quit.
+    (define-key map (kbd "<escape>") 'keyboard-quit)
+    (define-key map ";" 'ignore)
+    (define-key map "'" 'jump-to-register)
+    (define-key map "=" 'indent-region)
+
+    ;; If 0 is pressed without any other digit args before it, then we
+    ;; goto the beginning of the line.
+    (evics-key-prefix-argument-overload map "0" 'digit-argument 'move-beginning-of-line)
+    (define-key map "1" 'digit-argument)
+    (define-key map "2" 'digit-argument)
+    (define-key map "3" 'digit-argument)
+    (define-key map "4" 'digit-argument)
+    (define-key map "5" 'digit-argument)
+    (define-key map "6" 'digit-argument)
+    (define-key map "7" 'digit-argument)
+    (define-key map "8" 'digit-argument)
+    (define-key map "9" 'digit-argument)
+
+    (define-key map "a" 'evics-append)
+    (define-key map "A" 'evics-append-line)
+    (define-key map (kbd "c i w") 'evics-kill-whole-word-insert)
+    (define-key map (kbd "c w") 'evics-kill-word-insert)
+    (define-key map (kbd "c c") 'evics-kill-whole-line-insert)
+    (define-key map "C" 'evics-kill-line-insert)
+    (define-key map (kbd "d w") 'evics-kill-whole-word)
+    (define-key map (kbd "d w") 'kill-word)
+    (define-key map (kbd "d d") 'evics-kill-whole-line)
+    (define-key map "D" 'kill-line)
+    (evics-key-prefix-argument-overload map "G" 'goto-line 'end-of-buffer)
+    (define-key map "H" 'evics-top-of-screen)
+    (define-key map "i" 'evics-goto-insert-mode)
+    (define-key map "I" 'evics-goto-Insert-mode)
+    (define-key map "J" 'down-list)
+    (define-key map "K" 'backward-up-list)
+    (define-key map "L" 'evics-bottom-of-screen)
+    (define-key map "m" 'point-to-register)
+    (define-key map "M" 'evics-middle-of-screen)
+    (define-key map "n" 'isearch-repeat-forward)
+    (define-key map "N" 'isearch-repeat-backward)
+    (define-key map "o" 'evics-newline-below)
+    (define-key map "O" 'evics-newline-above)
+    (define-key map "p" 'yank)
+    (define-key map "P" 'yank)
+    (define-key map "q" 'evics-toggle-kbd-macro)
+    (define-key map "r" 'evics-replace-char)
+    (define-key map "u" 'undo)
+    (define-key map "x" 'delete-forward-char)
+    (define-key map "z" 'eval-defun)
+
+    ;; Will need to remove undo-tree dependency in the future
+    (define-key map (kbd "C-j") 'evics-join-line)
+    (define-key map (kbd "C-r") 'evics-redo)
+    (define-key map (kbd "C-v") 'rectangle-mark-mode)
+    (define-key map (kbd "C-=") 'align)
+    (define-key map (kbd "DEL") 'left-char)
+    (define-key map (kbd "RET") 'isearch-exit)
+    map)
+  "Evics normal mode keymap")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;             commands              ;;;;;;;;;;;;;;
@@ -418,8 +414,6 @@ in evics-command-mode-map"
   :init-value nil
   ;; The indicator for the mode line.
   :lighter " <N>"
-  ;; The minor mode bindings.
-  :keymap evics-normal-mode-map
   :group 'evics-normal
   (setq cursor-type 'box)
   (evics-init-esc))
@@ -429,8 +423,6 @@ in evics-command-mode-map"
   :init-value nil
   ;; The indicator for the mode line.
   :lighter " <M>"
-  ;; The minor mode bindings.
-  :keymap evics-mini-mode-map
   :group 'evics-mini
   (evics-disable-all-modes)
   (setq cursor-type 'box))

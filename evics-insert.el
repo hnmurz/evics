@@ -10,8 +10,6 @@
   :init-value nil
   ;; The indicator for the mode line.
   :lighter " <I>"
-  ;; The minor mode bindings.
-  :keymap evics-insert-mode-map
   :group 'evics-insert
   (setq cursor-type 'bar)
   (when (and (boundp 'evics-visual-insert-callback)
