@@ -3,11 +3,8 @@
 ;; - Add logic to push mark before calling anything in evics-visual-transient-mode-map
 ;; Afterwards we can restore the mark.
 ;; - "q" doesnt work in backtrace buffer for debug on error
-;; - Investigate keybindings prio in vc-diff, might be related to ordering of minor-mode-map-alist
-;;   See https://emacs.stackexchange.com/questions/13447/how-to-set-a-rule-for-the-order-of-minor-mode-map-alist
 ;; - Make a special keybinding for "(" to enclose brackets around next sexp
 ;; - When looking at a directory file, return doesnt open the file
-;; - Make yank (pasting) more like vim
 ;; - Probably have to change evics-command-mode-map to be an alist instead of keymap to handle
 ;; string arguments
 ;; - Show current mode on modeline
@@ -75,7 +72,13 @@ else it will call cb2"
   (interactive)
   (evics-insert-mode -1)
   (evics-visual-mode -1)
-  (evics-normal-mode t)
+  ;; This function is called from `mark-deactivate-hook', so we only
+  ;; want to enable `evics-normal-mode' if we are not in mini-mode. A
+  ;; specific example of this would be if we use C-s (`helm-occur') in
+  ;; a buffer in mini mode, we will go into `evics-normal-mode'
+  ;; afterwards
+  (when (not evics-mini-mode)
+    (evics-normal-mode t))
   ;; We dont want to leave blank lines with whitespace.
   (evics-left-char-same-line)
   (save-excursion
@@ -171,7 +174,7 @@ for other minor modes."
 (add-hook 'diff-mode-hook 'evics-mini-mode)
 (add-hook 'debugger-mode-hook 'evics-mini-mode)
 (add-hook 'messages-buffer-mode-hook 'evics-mini-mode)
-;; (add-hook 'vc-annotate-mode-hook 'evics-mini-mode)
+(add-hook 'Man-mode-hook 'evics-mini-mode)
 
 ;; This does not seem to work.. for now I init the escape key
 ;; conditionaliy when entering evics normal mode

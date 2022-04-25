@@ -10,14 +10,15 @@
 
 (defun evics-yank ()
   "We have to disable evics-visual-mode here. We can't use the
-deactivate-mark-hook since this will be called after the mark is
-disabled which seems to happen after post-command-hook. So
-post-command-hook will move the cursor."
+`deactivate-mark-hook' since this will be called after the mark
+is disabled which seems to happen after `post-command-hook'. So
+`post-command-hook' will move the cursor."
   (interactive)
   ;; Note: We have delete-selection-mode enabled.
-  (call-interactively 'yank)
-  )
-  ;; (evics-normal-mode t))
+  (evics-visual-mode -1)
+  (delete-selection-mode t)
+  (delete-selection-helper 'yank)
+  (evics-normal-mode t))
 
 (defun evics-goto-Insert-mode ()
   "Switch from whatever evics mode to insert"
@@ -77,7 +78,7 @@ beginning of sexp"
 
 (defun evics-backward-WORD ()
   "Skip backwards over a WORD. evics-WORD was defined with
-define-thing-chars, and this macro does not seem to assign a
+`define-thing-chars', and this macro does not seem to assign a
 forward op. So this method uses a makeshift forward op."
   (interactive)
   (while
@@ -92,7 +93,7 @@ forward op. So this method uses a makeshift forward op."
 
 (defun evics-forward-WORD ()
   "Skip over a WORD. evics-WORD was defined with
-define-thing-chars, and this macro does not seem to assign a
+`define-thing-chars', and this macro does not seem to assign a
 forward op. So this method uses a makeshift forward op."
   (interactive)
   (while
@@ -212,7 +213,7 @@ next character the user types"
 
 (defun evics-regex-replace ()
   "Check if we have any desirable backend like visual regexp or
-anzu installed. If not then invoke regexp-replace"
+anzu installed. If not then invoke `regexp-replace'"
   (interactive)
   ;; Using cond here instead of if incase in the future we want to add
   ;; another possible backend, perhaps anzu.
@@ -366,7 +367,7 @@ in evics-command-mode-map"
     (define-key map "N" 'isearch-repeat-backward)
     (define-key map "o" 'evics-newline-below)
     (define-key map "O" 'evics-newline-above)
-    (define-key map "p" 'yank)
+    (define-key map "p" 'yank)  ;; Note: We have delete-selection-mode enabled.
     (define-key map "P" 'yank)
     (define-key map "q" 'evics-toggle-kbd-macro)
     (define-key map "r" 'evics-replace-char)
@@ -414,6 +415,7 @@ in evics-command-mode-map"
   :init-value nil
   ;; The indicator for the mode line.
   :lighter " <N>"
+  :keymap nil
   :group 'evics-normal
   (setq cursor-type 'box)
   (evics-init-esc))
@@ -423,6 +425,7 @@ in evics-command-mode-map"
   :init-value nil
   ;; The indicator for the mode line.
   :lighter " <M>"
+  :keymap nil
   :group 'evics-mini
   (evics-disable-all-modes)
   (setq cursor-type 'box))
