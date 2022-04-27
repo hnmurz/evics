@@ -231,6 +231,15 @@ anzu installed. If not then invoke `regexp-replace'"
       (setq evics-normal--kbd-macro-register (read-char "Register: "))
       (start-kbd-macro nil))))
 
+(defun evics-disable-all-modes ()
+  "Disable all evics modes. This is used for specific
+scenearios (help buffers etc), so we don't clobber keybindings
+for other minor modes."
+  (evics-normal-mode -1)
+  (evics-visual-mode -1)
+  (evics-insert-mode -1)
+  (setq cursor-type 'box))
+
 ;(defun evics-command ()
 ;  "Read command from minibuffer and perform the action specified
 ;in evics-command-mode-map"
@@ -358,8 +367,8 @@ in evics-command-mode-map"
     (define-key map "H" 'evics-top-of-screen)
     (define-key map "i" 'evics-goto-insert-mode)
     (define-key map "I" 'evics-goto-Insert-mode)
-    (define-key map "J" 'down-list)
-    (define-key map "K" 'backward-up-list)
+    (define-key map "J" 'evics-join-line)
+    (define-key map "K" 'man)
     (define-key map "L" 'evics-bottom-of-screen)
     (define-key map "m" 'point-to-register)
     (define-key map "M" 'evics-middle-of-screen)
@@ -376,7 +385,6 @@ in evics-command-mode-map"
     (define-key map "z" 'eval-defun)
 
     ;; Will need to remove undo-tree dependency in the future
-    (define-key map (kbd "C-j") 'evics-join-line)
     (define-key map (kbd "C-r") 'evics-redo)
     (define-key map (kbd "C-v") 'rectangle-mark-mode)
     (define-key map (kbd "C-=") 'align)

@@ -18,24 +18,24 @@
 
 (defvar evics--region-position nil
   "Position of the start of the region. To properly emulate
-  selecting lines we need to sometimes skip over 2 lines. This
-  variable is used in conjunction with evics-previous-line-number
-  to control this behaviour")
+selecting lines we need to sometimes skip over 2 lines. This
+variable is used in conjunction with evics-previous-line-number
+to control this behaviour")
 (make-variable-buffer-local 'evics--region-position)
 
 (defvar evics--previous-line-number nil
   "Position of the point before executing the previous
-  command. This variable is set in the pre-command-hook.")
+command. This variable is set in the pre-command-hook.")
 (make-variable-buffer-local 'evics--previous-line-number)
 
 (defvar evics-visual-block-callback nil
   "Callback to disable the transient rectangle-mark-mode-map that
-  we enable when selecting rectangles in rectangle-mark-mode")
+we enable when selecting rectangles in rectangle-mark-mode")
 (make-variable-buffer-local 'evics-visual-block-callback)
 
 (defvar evics-use-mini-mode nil
   "Use our mini keybindings to reduce keybinding cloberring in
-  specific modes.")
+specific modes.")
 
 ;; See example: evil-redirect-digit-argument
 ;; also see:    https://stackoverflow.com/questions/29956644/elisp-defmacro-with-lambda
@@ -116,21 +116,24 @@ under certain conditions. This is taken from viper mode."
 (require 'evics-insert)
 (require 'evics-visual)
 
-(defun evics-disable-all-modes ()
-  "Disable all evics modes. This is used for specific
-scenearios (help buffers etc), so we don't clobber keybindings
-for other minor modes."
-  (evics-normal-mode -1)
-  (evics-visual-mode -1)
-  (evics-insert-mode -1)
-  (setq cursor-type 'box))
-
 (defun evics-enable-normal-mode ()
-  "Function that will determine if we want to enable evics"
+  "Determine if we want to enable evics. As of now the only
+exclusion is being inside the minibuffer."
   (if (not (minibufferp (current-buffer)))
       (evics-normal-mode 1)))
 (define-globalized-minor-mode evics-global-mode evics-normal-mode evics-enable-normal-mode)
 (evics-init-esc)
+
+(defun reload-evics ()
+  "Forcibly reload evics, this is useful if you are changing
+keybindings on the fly and noticing they are not taking effect."
+  (interactive)
+  (unload-feature 'evics t)
+  (unload-feature 'evics-visual t)
+  (unload-feature 'evics-normal t)
+  (unload-feature 'evics-insert t)
+  (require 'evics)
+  (evics-global-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Non evics related config
@@ -188,7 +191,7 @@ for other minor modes."
    (cons 'evics-normal-mode evics-normal-mode-map)
    (cons 'evics-insert-mode evics-insert-mode-map))
   "List of keymaps that evics is using. The order of the keymaps
-  is important since it sets the precendence.")
+is important since it sets the precendence.")
 (add-to-list 'emulation-mode-map-alists 'evics--emulation-maps)
 
 (provide 'evics)

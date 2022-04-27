@@ -1,6 +1,6 @@
 (defvar evics-mark-active-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "M-c") 'evics-goto-normal-mode)
+    (define-key map (kbd "M-c") 'evics-visual-goto-normal-mode)
     ;; Using `kill-region' interactively will handle rectangle
     ;; selections nicely
     (define-key map (kbd "x") 'kill-region)
@@ -8,17 +8,23 @@
     (define-key map (kbd "<escape>") 'evics-visual-goto-normal-mode)
     map)
   "This keymap will be active whenever the mark is active. Use
-this keymap to bind any custom selection functions that you want
-to write. By default this map will not have any new behaviour
-since this would not be included in vanilla emacs or vim. But,
-feel free to add your own custom functions.")
+this keymap to bind any custom selection functions that you
+want to write. Example:
+
+(define-key evics-mark-active-mode-map (kbd \"f\") \'mark-defun)
+
+It is recommended to be wise with whatever keybindings you add
+here since they could clobber keybindings in other modes. By
+default this map will not have any new behaviour since this would
+not be included in vanilla emacs or vim. But, feel free to add
+your own custom functions.")
 
 (defun evics-visual-goto-normal-mode ()
   "Switch from visual evics mode to evics normal mode"
   (interactive)
   (evics-visual-mode -1)
-  (evics-normal-mode t)
-  (evics-left-char-same-line)
+  (if (not evics-mini-mode)
+      (evics-normal-mode t))
   (keyboard-quit) ;; Seems to clobber the message call below
   (message "-- NORMAL --"))
 
@@ -75,10 +81,18 @@ lines."
           (call-interactively 'evics-select-line)
           (forward-line -1))))))
 
+(defun evics-visual-deactivate-mark-hook ()
+  "This function is invoked when we deactivate the mark. It's
+purpose is to simply disable `evics-visual-mode'"
+  (interactive)
+  (evics-visual-mode -1)
+  (if (not evics-mini-mode)
+      (evics-normal-mode t)))
+
 (add-hook 'pre-command-hook 'evics-visual-pre-command)
 (add-hook 'post-command-hook 'evics-visual-post-command)
 (add-hook 'activate-mark-hook '(lambda () (setq cursor-type 'bar)))
-(add-hook 'deactivate-mark-hook 'evics-goto-normal-mode)
+(add-hook 'deactivate-mark-hook 'evics-visual-deactivate-mark-hook)
 
 (define-minor-mode evics-visual-mode
   "Toggle evics visual mode."
