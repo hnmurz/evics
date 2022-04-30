@@ -311,6 +311,8 @@ in evics-command-mode-map"
     (define-key map "j" 'next-line)
     (define-key map "k" 'previous-line)
     (define-key map "l" 'right-char)
+    (define-key map "n" 'isearch-repeat-forward)
+    (define-key map "N" 'isearch-repeat-backward)
     (define-key map "y" 'evics-kill-ring-save)
     (define-key map "v" 'set-mark-command)
     (define-key map "V" 'evics-select-line)
@@ -372,8 +374,6 @@ in evics-command-mode-map"
     (define-key map "L" 'evics-bottom-of-screen)
     (define-key map "m" 'point-to-register)
     (define-key map "M" 'evics-middle-of-screen)
-    (define-key map "n" 'isearch-repeat-forward)
-    (define-key map "N" 'isearch-repeat-backward)
     (define-key map "o" 'evics-newline-below)
     (define-key map "O" 'evics-newline-above)
     (define-key map "p" 'yank)  ;; Note: We have delete-selection-mode enabled.

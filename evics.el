@@ -1,4 +1,7 @@
 ;; EVICS
+;; - When yanking in mini-mode we go back to normal for some reason
+;; - Investigate rectangle mark mode and minibuffer, I.e,
+;; mark rectangle "I", then cant use "I" in minibuf
 ;; - When pasting over region, mark remains set afterwards, look into fixing evics-yank
 ;; - Add logic to push mark before calling anything in evics-visual-transient-mode-map
 ;; Afterwards we can restore the mark.
@@ -164,7 +167,9 @@ keybindings on the fly and noticing they are not taking effect."
       (funcall evics-visual-block-callback)
       (setq evics-visual-block-callback nil))))
 (define-key rectangle-mark-mode-map (kbd "I") 'string-rectangle)
+(define-key rectangle-mark-mode-map (kbd "C-r") 'replace-rectangle)
 (add-hook 'rectangle-mark-mode-hook 'evics-toggle-transient-rectangle-map)
+(add-hook 'minibuffer-inactive-mode-hook '(lambda () (rectangle-mark-mode -1)))
 
 ;; These modes operate on read only buffers, as such, we don't want to
 ;; clobber their keybindings, so we try and use a minimalist evics
