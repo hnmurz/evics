@@ -1,4 +1,5 @@
 ;; EVICS
+;; - remove transient map from rectangle mode. We can just use emulation to fix the keybinding prio
 ;; - When yanking in mini-mode we go back to normal for some reason
 ;; - Investigate rectangle mark mode and minibuffer, I.e,
 ;; mark rectangle "I", then cant use "I" in minibuf

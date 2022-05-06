@@ -84,6 +84,7 @@ forward op. So this method uses a makeshift forward op."
   (while
       (not
        (and (thing-at-point 'evics-WORD)
+            (car (bounds-of-thing-at-point 'word))
             (and (> (point)
                     (car (bounds-of-thing-at-point 'word)))
                  (<= (point)
@@ -99,6 +100,7 @@ forward op. So this method uses a makeshift forward op."
   (while
       (not
        (and (thing-at-point 'evics-WORD)
+            (car (bounds-of-thing-at-point 'word))
             (and (>= (point)
                      (car (bounds-of-thing-at-point 'word)))
                  (< (point)
