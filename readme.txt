@@ -4,6 +4,15 @@ possible. The tradeoff is that it does not contain all of vim's
 functionality, and that there are differences in behaviours between
 the emulated commands and the native vim one's.
 
+As some background, originally I was using the evil package, but I was
+annoyed how it took over everything and felt the need to re-implement
+a lot of functionality that already existed inside of Emacs.
+
+This package is mainly for my personal use, I have put it online in
+case someone else finds use in it. As of now, this package is
+relatively complete. It serves most of my personal purposes.
+
+
 A very rudimentary "command" mode was implemented, for example, to
 open a file:
 
@@ -19,20 +28,16 @@ the underlying command is only invoked after you hit return.
 To view the implemented keybindings, please refer to evics-normal.el.
 
 Its important to note the existence of
-evics-visual-transient-mode-map. This map is activated with
-set-transient-map whenever the mark is activated. A use for this map
-would be to put some user defined functions to enhance text
-selection. For example, adding a keybinding that would select the
-whole active function.
+evics-mark-active-mode-map. This map is activate whenever the mark is
+activate. A use for this map would be to put some user defined
+functions to enhance text selection. For example, adding a keybinding
+that would select the whole active function:
+
+   (define-key evics-mark-active-mode-map (kbd "f") 'mark-defun)
 
 
-This package is not complete, it is still in it's early
-stages. Originally I was using the evil package, but I was annoyed how
-it took over everything and felt the need to re-implement a lot of
-functionality that already existed inside of Emacs. This package is
-mainly for my personal use, I have put it online in case someone else
-finds use in it. To use, simply clone this git repo and use the
-following elisp snippet:
+To use, simply clone this git repo and use the following elisp
+snippet:
 
      (add-to-list 'load-path "<PATH TO EVICS>")
      (require 'evics)
