@@ -244,54 +244,22 @@ for other minor modes."
   (evics-insert-mode -1)
   (setq cursor-type 'box))
 
-;(defun evics-command ()
-;  "Read command from minibuffer and perform the action specified
-;in evics-command-mode-map"
-;  (interactive)
-;  ;; We can specify a keymap and bind tab to a completion
-;  ;; function... look at evil implementation
-;  (let ((input (read-from-minibuffer ":"))
-;        (command nil))
-;    (setq command (car (cdr (assoc input evics-command-mode-alist))))
-;    (if command
-;        ;; Perhaps switch to funcall in the future
-;        (call-interactively command)
-;      ((mapc (lambda (x)
-;               (call-interactively
-;                (car (cdr (assoc (key-description (list x)) evics-command-mode-alist)))))
-;             input)))))
-
 (defun evics-command ()
   "Read command from minibuffer and perform the action specified
 in evics-command-mode-map"
   (interactive)
   ;; We can specify a keymap and bind tab to a completion
   ;; function... look at evil implementation
-  (let ((input (read-from-minibuffer ":"))
-        (command nil))
-    (setq command (car (cdr (assoc input evics-command-mode-alist))))
-    (if command
-        ;; Perhaps switch to funcall in the future
-        (call-interactively command)
-      ((mapc (lambda (x)
-               (call-interactively
-                (car (cdr (assoc (key-description (list x)) evics-command-mode-alist)))))
-             input)))))
-
-;;(defun evics-command ()
-;;  "Read command from minibuffer and perform the action specified
-;;in evics-command-mode-map"
-;;  (interactive)
-;;  ;; We can specify a keymap and bind tab to a completion
-;;  ;; function... look at evil implementation
-;;  (let ((input (read-from-minibuffer ":")))
-;;    (mapc (lambda (x)
-;;            ;; Want to switch to funcall.. not sure how to handle
-;;            ;; find-file
-;;            (call-interactively
-;;             (lookup-key evics-command-mode-map
-;;                         (key-description (list x)))))
-;;          input)))
+  (let* ((input (read-from-minibuffer ":"))
+         (input-symbol (read input))
+         (command nil))
+    (setq command (cadr (assoc input evics-command-mode-alist)))
+    (cond (command
+           (call-interactively command))
+          ((functionp input-symbol)
+           (call-interactively input-symbol))
+          (t
+           (message (concat "Unknown command: " input))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;         Keymap            ;;;;;;;;;;;;;;;
@@ -410,17 +378,6 @@ in evics-command-mode-map"
         ("vsplit" split-window-right)
         ("split" split-window-below)
         ("s" evics-regex-replace)))
-
-;; To remove
-(defvar evics-command-mode-map (make-sparse-keymap) "Evics command mode keymap")
-(define-key evics-command-mode-map (kbd "w") 'save-buffer)
-(define-key evics-command-mode-map (kbd "W") 'save-buffer)
-(define-key evics-command-mode-map (kbd "q") 'kill-buffer)
-(define-key evics-command-mode-map (kbd "Q") 'save-buffers-kill-terminal)
-(define-key evics-command-mode-map (kbd "o") 'delete-other-windows)
-(define-key evics-command-mode-map (kbd "e") 'find-file)
-(define-key evics-command-mode-map (kbd "s") 'evics-regex-replace)
-;; (define-key evics-command-mode-map (kbd "split") 'split-window)
 
 (define-minor-mode evics-normal-mode
   "Toggle evics normal mode."
