@@ -1,5 +1,4 @@
 ;; EVICS
-;; - remove transient map from rectangle mode. We can just use emulation to fix the keybinding prio
 ;; - When yanking in mini-mode we go back to normal for some reason
 ;; - Investigate rectangle mark mode and minibuffer, I.e,
 ;; mark rectangle "I", then cant use "I" in minibuf
@@ -32,11 +31,6 @@ to control this behaviour")
 command. This variable is set in the pre-command-hook.")
 (make-variable-buffer-local 'evics--previous-line-number)
 
-(defvar evics-visual-block-callback nil
-  "Callback to disable the transient rectangle-mark-mode-map that
-we enable when selecting rectangles in rectangle-mark-mode")
-(make-variable-buffer-local 'evics-visual-block-callback)
-
 (defvar evics-use-mini-mode nil
   "Use our mini keybindings to reduce keybinding cloberring in
 specific modes.")
@@ -59,11 +53,6 @@ else it will call cb2"
 
 (require 'thingatpt)
 (define-thing-chars evics-WORD "[:alnum:]_-")
-
-(defun evics-keep-pred-cb ()
-  "Callback to supply to set-transient-map"
-  (interactive)
-  t)
 
 (defun evics-left-char-same-line ()
   "Only go as far left as column 0"
@@ -154,23 +143,8 @@ keybindings on the fly and noticing they are not taking effect."
 (define-key winner-mode-map (kbd "C-a c") 'delete-window)
 (winner-mode t)
 
-(define-key emacs-lisp-mode-map (kbd "M-t") 'xref-find-definitions)
-(define-key emacs-lisp-mode-map (kbd "M-<") 'xref-pop-marker-stack)
-
-;; Configure rectangle marking
-(defun evics-toggle-transient-rectangle-map ()
-  "DOCSTRING"
-  (if rectangle-mark-mode
-      (progn (setq evics-visual-block-callback
-                   (set-transient-map
-                    rectangle-mark-mode-map 'evics-keep-pred-cb)))
-    (when evics-visual-block-callback
-      (funcall evics-visual-block-callback)
-      (setq evics-visual-block-callback nil))))
 (define-key rectangle-mark-mode-map (kbd "I") 'string-rectangle)
-(define-key rectangle-mark-mode-map (kbd "C-r") 'replace-rectangle)
-(add-hook 'rectangle-mark-mode-hook 'evics-toggle-transient-rectangle-map)
-(add-hook 'minibuffer-inactive-mode-hook '(lambda () (rectangle-mark-mode -1)))
+(define-key rectangle-mark-mode-map (kbd "r") 'replace-rectangle)
 
 ;; These modes operate on read only buffers, as such, we don't want to
 ;; clobber their keybindings, so we try and use a minimalist evics
