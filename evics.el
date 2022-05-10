@@ -1,11 +1,7 @@
 ;; EVICS
-;; - When yanking in mini-mode we go back to normal for some reason
-;; - Investigate rectangle mark mode and minibuffer, I.e,
-;; mark rectangle "I", then cant use "I" in minibuf
 ;; - When pasting over region, mark remains set afterwards, look into fixing evics-yank
 ;; - Add logic to push mark before calling anything in evics-visual-transient-mode-map
 ;; Afterwards we can restore the mark.
-;; - "q" doesnt work in backtrace buffer for debug on error
 ;; - Make a special keybinding for "(" to enclose brackets around next sexp
 ;; - When looking at a directory file, return doesnt open the file
 ;; - Probably have to change evics-command-mode-map to be an alist instead of keymap to handle

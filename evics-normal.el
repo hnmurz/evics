@@ -58,9 +58,11 @@ beginning of sexp"
 (defun evics-kill-ring-save ()
   "Call kill ring save and force us out of visual mode"
   (interactive)
+  (exchange-point-and-mark)
   (call-interactively 'kill-ring-save)
   (evics-visual-mode -1)
-  (evics-normal-mode 1))
+  (if (not evics-mini-mode)
+      (evics-normal-mode 1)))
 
 (defun evics-redo ()
   "If undotree is present call that, else no-op"
