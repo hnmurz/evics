@@ -31,6 +31,10 @@ command. This variable is set in the pre-command-hook.")
   "Use our mini keybindings to reduce keybinding cloberring in
 specific modes.")
 
+(defvar evics-esc-timeout 0.01
+  "How long to wait before registering an ESC keypress as escape
+vs using it as meta. This is only used for emacs in TTY mode.")
+
 ;; See example: evil-redirect-digit-argument
 ;; also see:    https://stackoverflow.com/questions/29956644/elisp-defmacro-with-lambda
 (defmacro evics-key-prefix-argument-overload (map key cb1 cb2)
@@ -89,9 +93,25 @@ else it will call cb2"
 
 (defun evics-esc (map)
   "Catch \\e on TTY and translate to escape if there is no other
-action after timeout"
+action after timeout. One may ask, why do we do this for TTY's?
+Using `showkey -a' can reveal the answer to us:
+
+showkey -a
+<pressing escape key>
+^[       27 0033 0x1b
+
+<pressing Meta+x
+^[x      27 0033 0x1b
+        120 0170 0x78
+
+We can see that the same key sequence appears when we press the
+escape button and when we press a meta key
+combination. Generally, someone will press escape on it's own, so
+using the timeout method is a good heuristic. Both viper and evil
+have similar functions, evics got the idea from their
+implementations."
   (if (and (equal (this-single-command-keys) [?\e])
-           (sit-for 0.1))
+           (sit-for evics-esc-timeout))
       [escape] map))
 
 (defun evics-init-esc (&optional frame)
