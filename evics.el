@@ -174,6 +174,7 @@ keybindings on the fly and noticing they are not taking effect."
 (add-hook 'debugger-mode-hook 'evics-mini-mode)
 (add-hook 'messages-buffer-mode-hook 'evics-mini-mode)
 (add-hook 'Man-mode-hook 'evics-mini-mode)
+(add-hook 'ediff-mode-hook 'evics-mini-mode)
 
 ;; This does not seem to work.. for now I init the escape key
 ;; conditionaliy when entering evics normal mode

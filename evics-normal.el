@@ -270,8 +270,6 @@ in evics-command-mode-map"
   (let ((map (make-keymap)))
     (suppress-keymap map)
     (define-key map ":" 'evics-command)
-    (define-key map "/" 'isearch-forward)
-    (define-key map "?" 'isearch-backward)
     (define-key map "$" 'move-end-of-line)
     (define-key map "B" 'evics-backward-WORD)
     (define-key map "b" 'backward-word)
@@ -313,6 +311,8 @@ in evics-command-mode-map"
     (define-key map ";" 'ignore)
     (define-key map "'" 'jump-to-register)
     (define-key map "=" 'indent-region)
+    (define-key map "/" 'isearch-forward)
+    (define-key map "?" 'isearch-backward)
 
     ;; If 0 is pressed without any other digit args before it, then we
     ;; goto the beginning of the line.
