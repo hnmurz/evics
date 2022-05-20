@@ -43,13 +43,13 @@ when we want different behaviour in the lack of prefix args.
 This function will call cb1 if `current-prefix-arg' is defined,
 else it will call cb2"
   `(define-key ,map (kbd ,key) 
-    '(lambda () (interactive)
-       (cond (current-prefix-arg
-              (setq this-command ,cb1)
-              (call-interactively ,cb1))
-             (t
-              (setq this-command ,cb2)
-              (call-interactively ,cb2))))))
+     #'(lambda () (interactive)
+         (cond (current-prefix-arg
+                (setq this-command ,cb1)
+                (call-interactively ,cb1))
+               (t
+                (setq this-command ,cb2)
+                (call-interactively ,cb2))))))
 
 (require 'thingatpt)
 (define-thing-chars evics-WORD "[:alnum:]_-")

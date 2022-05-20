@@ -91,7 +91,7 @@ purpose is to simply disable `evics-visual-mode'"
 
 (add-hook 'pre-command-hook 'evics-visual-pre-command)
 (add-hook 'post-command-hook 'evics-visual-post-command)
-(add-hook 'activate-mark-hook '(lambda () (setq cursor-type 'bar)))
+(add-hook 'activate-mark-hook #'(lambda () (setq cursor-type 'bar)))
 (add-hook 'deactivate-mark-hook 'evics-visual-deactivate-mark-hook)
 
 (define-minor-mode evics-visual-mode
