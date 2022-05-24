@@ -24,7 +24,8 @@ your own custom functions.")
   (interactive)
   (evics-visual-mode -1)
   (if (not evics-mini-mode)
-      (evics-normal-mode t))
+      (evics-normal-mode t)
+    (setq cursor-type 'box))
   (keyboard-quit) ;; Seems to clobber the message call below
   (message "-- NORMAL --"))
 
