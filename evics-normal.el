@@ -309,6 +309,7 @@ in evics-command-mode-map"
     ;; keyboard escape quit.
     (define-key map (kbd "<escape>") 'keyboard-quit)
     (define-key map ";" 'ignore)
+    (define-key map "#" 'ignore)
     (define-key map "'" 'jump-to-register)
     (define-key map "=" 'indent-region)
     (define-key map "/" 'isearch-forward)
