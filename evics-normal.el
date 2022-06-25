@@ -388,7 +388,9 @@ in evics-command-mode-map"
   :keymap nil
   :group 'evics-normal
   (setq cursor-type 'box)
-  (evics-init-esc))
+  (evics-init-esc)
+  (when (and evics-mini-mode evics-normal-mode)
+    (evics-normal-mode -1)))
 
 (define-minor-mode evics-mini-mode
   "Toggle evics normal mode."
