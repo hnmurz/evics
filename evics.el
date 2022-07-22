@@ -183,9 +183,9 @@ keybindings on the fly and noticing they are not taking effect."
 ;; conditionaliy when entering evics normal mode
 ;; (add-to-list 'after-make-frame-functions #'evics-init-esc)
 
+;; Entries without an order always appear at end
 (defvar evics--emulation-maps
   (list
-   (cons 'rectangle-mark-mode rectangle-mark-mode-map)
    (cons 'mark-active         evics-mark-active-mode-map)
    (cons 'evics-mini-mode     evics-user-normal-map)
    (cons 'evics-mini-mode     evics-mini-mode-map)
@@ -195,6 +195,17 @@ keybindings on the fly and noticing they are not taking effect."
    (cons 'evics-insert-mode evics-insert-mode-map))
   "List of keymaps that evics is using. The order of the keymaps
 is important since it sets the precendence.")
+(add-to-ordered-list 'evics--emulation-maps (cons 'rectangle-mark-mode rectangle-mark-mode-map) 0)
+(add-to-ordered-list 'evics--emulation-maps (cons 'mark-active evics-mark-active-mode-map) 1)
+
+(defun evics-add-to-emulation-map (arg index)
+  "Arg is expected to represent the element form expected for
+add-to-ordered-list. See examples in this file for what this form
+looks like. This function adds 2 to the supplied index since the
+first 2 indices are reserved for evics."
+  (setq index (+ index 2))
+  (add-to-ordered-list 'evics--emulation-maps arg index))
+
 (add-to-list 'emulation-mode-map-alists 'evics--emulation-maps)
 
 (provide 'evics)

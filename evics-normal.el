@@ -121,6 +121,9 @@ forward op. So this method uses a makeshift forward op."
   (interactive)
   ;; Hack to prevent us from going to the previous word if we are at
   ;; the start of the word
+  ;;
+  ;; In the future I should update this function to use
+  ;; bounds-of-thing-at-point
   (forward-char)
   (backward-word)
   (kill-word 1))
