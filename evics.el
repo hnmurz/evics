@@ -38,11 +38,11 @@ vs using it as meta. This is only used for emacs in TTY mode.")
 ;; See example: evil-redirect-digit-argument
 ;; also see:    https://stackoverflow.com/questions/29956644/elisp-defmacro-with-lambda
 (defmacro evics-key-prefix-argument-overload (map key cb1 cb2)
-  "Overload function key with the specified cbs. This is useful 
-when we want different behaviour in the lack of prefix args. 
+  "Overload function key with the specified cbs. This is useful
+when we want different behaviour in the lack of prefix args.
 This function will call cb1 if `current-prefix-arg' is defined,
 else it will call cb2"
-  `(define-key ,map (kbd ,key) 
+  `(define-key ,map (kbd ,key)
      #'(lambda () (interactive)
          (cond (current-prefix-arg
                 (setq this-command ,cb1)
@@ -167,15 +167,15 @@ keybindings on the fly and noticing they are not taking effect."
 ;; keymap that will just have navigation commands enabled. This
 ;; approach seems a little more pragmatic than dealing with keymap
 ;; priority.
-(add-hook 'special-mode-hook 'evics-mini-mode)
-(add-hook 'Info-mode-hook 'evics-mini-mode)
-(add-hook 'compilation-mode-hook 'evics-mini-mode)
-(add-hook 'diff-mode-hook 'evics-mini-mode)
-(add-hook 'debugger-mode-hook 'evics-mini-mode)
+(add-hook 'special-mode-hook         'evics-mini-mode)
+(add-hook 'Info-mode-hook            'evics-mini-mode)
+(add-hook 'compilation-mode-hook     'evics-mini-mode)
+(add-hook 'diff-mode-hook            'evics-mini-mode)
+(add-hook 'debugger-mode-hook        'evics-mini-mode)
 (add-hook 'messages-buffer-mode-hook 'evics-mini-mode)
-(add-hook 'Man-mode-hook 'evics-mini-mode)
-(add-hook 'ediff-mode-hook 'evics-mini-mode)
-(add-hook 'edit-abbrevs-mode-hook 'evics-mini-mode)
+(add-hook 'Man-mode-hook             'evics-mini-mode)
+(add-hook 'ediff-mode-hook           'evics-mini-mode)
+(add-hook 'edit-abbrevs-mode-hook    'evics-mini-mode)
 
 ;; This does not seem to work.. for now I init the escape key
 ;; conditionaliy when entering evics normal mode
@@ -184,8 +184,11 @@ keybindings on the fly and noticing they are not taking effect."
 (defvar evics--emulation-maps
   (list
    (cons 'rectangle-mark-mode rectangle-mark-mode-map)
-   (cons 'mark-active evics-mark-active-mode-map)
-   (cons 'evics-mini-mode evics-mini-mode-map)
+   (cons 'mark-active         evics-mark-active-mode-map)
+   (cons 'evics-mini-mode     evics-user-normal-map)
+   (cons 'evics-mini-mode     evics-mini-mode-map)
+   ;; This approach is easier than maintaining a new evics-user-mode variable.
+   (cons 'evics-normal-mode evics-user-normal-map)
    (cons 'evics-normal-mode evics-normal-mode-map)
    (cons 'evics-insert-mode evics-insert-mode-map))
   "List of keymaps that evics is using. The order of the keymaps

@@ -262,8 +262,19 @@ in evics-command-mode-map"
            (message (concat "Unknown command: " input))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;         Keymap            ;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;         Keymaps           ;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar evics-user-normal-map (make-keymap)
+  "Since we have a mini and normal keymap. Defining keys in
+evics-normal-mode-map doesnt necessarily carry over to buffers
+that are only using the mini mode. To remedy this, please add
+keybindings to this keymap.
+
+In the future, the plan is to have some scheme to easily allow
+per minor mode overrides. But, perhaps just increasing the
+priority of these minor mode maps is the better solution. The
+only issue with this is that these defined minor modes have a lot
+of unused default keybindings that might clobber evics bindings.")
 
 (require 'rect)
 (defvar evics-mini-mode-map
@@ -301,7 +312,7 @@ in evics-command-mode-map"
   (let ((map (make-keymap)))
     (suppress-keymap map)
     (set-keymap-parent map evics-mini-mode-map)
-    
+
     (define-key map "@" 'jump-to-register)
     (define-key map "%" 'evics-goto-matching-paren)
     (define-key map "_" 'beginning-of-line-text)
