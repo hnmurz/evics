@@ -1,4 +1,6 @@
 ;; EVICS
+;; - Get rid of evics-mini-mode. Just use a variable to key off if we want to use the
+;; minikeymap or not.
 ;; - When pasting over region, mark remains set afterwards, look into fixing evics-yank
 ;; - Add logic to push mark before calling anything in evics-visual-transient-mode-map
 ;; Afterwards we can restore the mark.

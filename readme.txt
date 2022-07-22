@@ -35,6 +35,12 @@ that would select the whole active function:
 
    (define-key evics-mark-active-mode-map (kbd "f") 'mark-defun)
 
+Another important keymap for users is evics-user-normal-map, this
+keymap can be used to override evics normal mode keybindings. It's
+recommended to use this map instead of evics-normal-mode-map directly
+since an evics-mini mode is defined for special buffers to avoid
+clobbering keybindings. Defining keys in evics-user-normal-map will
+have precedence over evics-normal-mode-map and evics-mini-mode-map.
 
 To use, simply clone this git repo and use the following elisp
 snippet:
