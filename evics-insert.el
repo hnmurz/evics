@@ -1,5 +1,6 @@
 (defvar evics-insert-mode-map
   (let ((map (make-keymap)))
+    (set-keymap-parent map global-map)
     (define-key map (kbd "M-c") 'evics-goto-normal-mode)
     (define-key map (kbd "<escape>") 'evics-goto-normal-mode)
     map)
