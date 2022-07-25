@@ -1,6 +1,9 @@
 (defvar evics-insert-mode-map
   (let ((map (make-keymap)))
-    (set-keymap-parent map global-map)
+    ;; Cannot inherit global map since we now override any insert mode
+    ;; modifications i.e. in c-mode ; will cause line to indent
+    ;; etc. Correct solution is to define a new variable for each
+    ;; minor mode we have to keep track of.
     (define-key map (kbd "M-c") 'evics-goto-normal-mode)
     (define-key map (kbd "<escape>") 'evics-goto-normal-mode)
     map)

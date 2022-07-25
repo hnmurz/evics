@@ -183,6 +183,10 @@ keybindings on the fly and noticing they are not taking effect."
 ;; conditionaliy when entering evics normal mode
 ;; (add-to-list 'after-make-frame-functions #'evics-init-esc)
 
+
+;; Need to find a way to nicely handle defining evics overriding keys
+;; for major modes
+
 ;; Entries without an order always appear at end
 (defvar evics--emulation-maps
   (list
@@ -199,6 +203,27 @@ is important since it sets the precendence.")
 (add-to-ordered-list 'evics--emulation-maps (cons 'evics-insert-mode evics-insert-mode-map) 2)
 (add-to-ordered-list 'evics--emulation-maps (cons 'rectangle-mark-mode rectangle-mark-mode-map) 0)
 (add-to-ordered-list 'evics--emulation-maps (cons 'mark-active evics-mark-active-mode-map) 1)
+
+(defun evics-define-key (mode key func)
+  "Bind FUNC to KEY in MODE's map.
+
+This keybinding will only be available if evics-normal-mode is
+enabled. So it is mainly used for keybindings that would
+interfere with insert mode. I.e. without any leader keys:
+   (kbd \"k\")"
+  ;; Not gonna deal with defun since it's a macro, and the macro
+  ;; expansion was proving to be a little annoying. I'll just call
+  ;; fset directly.
+  (fset (intern (concat "evics--" (symbol-name func)))
+        `(lambda ()
+           (interactive)
+           (if evics-normal-mode
+               (call-interactively ',func)
+             (call-interactively 'self-insert-command))))
+  (define-key
+    (symbol-value (intern-soft (concat (symbol-name mode) "-map")))
+    key
+    (intern-soft (concat "evics--" (symbol-name func)))))
 
 (defun evics-add-to-emulation-map (arg index)
   "Arg is expected to represent the element form expected for

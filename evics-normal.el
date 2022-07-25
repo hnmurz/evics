@@ -198,9 +198,10 @@ newline."
   (evics-goto-insert-mode))
 
 (defun evics-append ()
-  "Goto end of line and enter insert mode"
+  "Goto next char and enter insert mode"
   (interactive)
-  (forward-char)
+  (when (not (= (point) (line-end-position)))
+    (forward-char))
   (evics-goto-insert-mode))
 
 (defun evics-append-line ()
