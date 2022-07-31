@@ -200,11 +200,11 @@ keybindings on the fly and noticing they are not taking effect."
    )
   "List of keymaps that evics is using. The order of the keymaps
 is important since it sets the precendence.")
-(add-to-ordered-list 'evics--emulation-maps (cons 'evics-insert-mode evics-insert-mode-map) 2)
 (add-to-ordered-list 'evics--emulation-maps (cons 'rectangle-mark-mode rectangle-mark-mode-map) 0)
 (add-to-ordered-list 'evics--emulation-maps (cons 'mark-active evics-mark-active-mode-map) 1)
+(add-to-ordered-list 'evics--emulation-maps (cons 'evics-insert-mode evics-insert-mode-map) 2)
 
-(defun evics-define-key (mode key func)
+(defun evics-define-key (mode key func &optional prefix)
   "Bind FUNC to KEY in MODE's map.
 
 This keybinding will only be available if evics-normal-mode is
@@ -214,6 +214,8 @@ interfere with insert mode. I.e. without any leader keys:
   ;; Not gonna deal with defun since it's a macro, and the macro
   ;; expansion was proving to be a little annoying. I'll just call
   ;; fset directly.
+  ;;
+  ;; This will define the evics wrapper for FUNC
   (fset (intern (concat "evics--" (symbol-name func)))
         `(lambda ()
            (interactive)
