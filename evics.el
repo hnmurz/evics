@@ -210,12 +210,14 @@ is important since it sets the precendence.")
 This keybinding will only be available if evics-normal-mode is
 enabled. So it is mainly used for keybindings that would
 interfere with insert mode. I.e. without any leader keys:
-   (kbd \"k\")"
+   (kbd \"k\")
+If the user is added a key combination with a prefix, they should
+just add the key combination normally with `define-key' and
+afterwards they can invoke `evics-define-prefix-key' with the
+prefix they have used."
   ;; Not gonna deal with defun since it's a macro, and the macro
   ;; expansion was proving to be a little annoying. I'll just call
-  ;; fset directly.
-  ;;
-  ;; This will define the evics wrapper for FUNC
+  ;; fset directly. This will define the evics wrapper for FUNC
   (fset (intern (concat "evics--" (symbol-name func)))
         `(lambda ()
            (interactive)
@@ -226,6 +228,16 @@ interfere with insert mode. I.e. without any leader keys:
     (symbol-value (intern-soft (concat (symbol-name mode) "-map")))
     key
     (intern-soft (concat "evics--" (symbol-name func)))))
+
+(defun evics-define-prefix-key (key)
+  "If we are using a key without modifiers (i.e. a key that would
+conflict with insert mode), then we have to add the prefix key to
+insert mode to override the prefix key we've defined. Remember,
+`evics-insert-mode-map' is one of evics' high priority maps,
+users should not put any keymaps with a higher precedence than
+this map."
+  (when (not (lookup-key evics-insert-mode-map key))
+    (define-key evics-insert-mode-map key 'self-insert-command)))
 
 (defun evics-add-to-emulation-map (arg index)
   "Arg is expected to represent the element form expected for

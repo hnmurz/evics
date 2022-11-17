@@ -64,14 +64,6 @@ beginning of sexp"
   (if (not evics-mini-mode)
       (evics-normal-mode 1)))
 
-(defun evics-redo ()
-  "If undotree is present call that, else no-op"
-  (interactive)
-  (if (and (locate-library "undo-tree")
-           (boundp 'undo-tree-mode)
-           undo-tree-mode)
-      (undo-tree-redo)))
-
 (defun evics-join-line ()
   "Join line of text with next one"
   (interactive)
@@ -368,12 +360,12 @@ of unused default keybindings that might clobber evics bindings.")
     (define-key map "P" 'yank)
     (define-key map "q" 'evics-toggle-kbd-macro)
     (define-key map "r" 'evics-replace-char)
-    (define-key map "u" 'undo)
+    (define-key map "u" 'undo-only)
     (define-key map "x" 'delete-forward-char)
     (define-key map "z" 'eval-defun)
 
     ;; Will need to remove undo-tree dependency in the future
-    (define-key map (kbd "C-r") 'evics-redo)
+    (define-key map (kbd "C-r") 'undo-redo)
     (define-key map (kbd "C-v") 'rectangle-mark-mode)
     (define-key map (kbd "C-=") 'align)
     (define-key map (kbd "DEL") 'left-char)
