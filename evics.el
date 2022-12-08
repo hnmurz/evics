@@ -24,10 +24,10 @@ variable is used in conjunction with evics-previous-line-number
 to control this behaviour")
 (make-variable-buffer-local 'evics--region-position)
 
-(defvar evics--previous-line-number nil
+(defvar evics--previous-position nil
   "Position of the point before executing the previous
 command. This variable is set in the pre-command-hook.")
-(make-variable-buffer-local 'evics--previous-line-number)
+(make-variable-buffer-local 'evics--previous-position)
 
 (defvar evics-use-mini-mode nil
   "Use our mini keybindings to reduce keybinding cloberring in
@@ -87,10 +87,18 @@ else it will call cb2"
   "Select whole line, by setting the mark at the start of the line"
   (interactive)
   (setq evics--region-position (line-number-at-pos))
-  (forward-line 1)
-  (move-beginning-of-line nil)
-  (set-mark (point))
-  (forward-line -1)
+  ;; We will handle the last line specially since sometimes there is
+  ;; no newline at the end of the last line.
+  (if (= (line-number-at-pos) (line-number-at-pos (point-max)))
+      (progn
+        (end-of-line)
+        (set-mark (point))
+        (beginning-of-line))
+    (progn
+      (forward-line 1)
+      (move-beginning-of-line nil)
+      (set-mark (point))
+      (forward-line -1)))
   (evics-visual-mode 1))
 
 (defun evics-esc (map)

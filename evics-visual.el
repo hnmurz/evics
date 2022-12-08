@@ -32,7 +32,7 @@ your own custom functions.")
 (defun evics-visual-pre-command ()
   "Check the current position vs `evics--region-position' and move
 mark accordingly to emulate vim line mode highlighting"
-  (setq evics--previous-line-number (line-number-at-pos)))
+  (setq evics--previous-position (point)))
 
 (defun evics-visual-post-command ()
   "Check `line-number-at-pos' vs `evics--region-position' and
@@ -46,7 +46,10 @@ cursor and or the mark accordingly to emulate selecting by whole
 lines."
   (if (and (boundp evics-visual-mode)
            evics-visual-mode)
-      (let ((line-number (line-number-at-pos)))
+      (let ((cur-line-number (line-number-at-pos))
+            (prev-line-number (line-number-at-pos evics--previous-position))
+            (max-line-number (line-number-at-pos (point-max))))
+        (beginning-of-line)
         (cond
          ;; This catches the case where we are moving down and are
          ;; wanting to higlight the originally marked line and the
@@ -57,30 +60,55 @@ lines."
          ;; mark. Therefore, we move the point to the originally
          ;; marked line, set the mark, and then move the point 2 lines
          ;; down, thus selecting the original line and the next one
-         ((<= evics--previous-line-number line-number)
+         ((<= prev-line-number cur-line-number)
           ;; Down movement scenario explained above
-          (cond ((= (+ 1 evics--region-position) line-number)
+          (cond ((= (1+ evics--region-position) cur-line-number)
                  (goto-line evics--region-position)
                  (set-mark (point))
-                 (goto-line (+ 1 line-number)))
+                 (goto-line (1+ cur-line-number)))
                 ;; This captures the scenario where we were moving
                 ;; more than 1 line at a time. In this scenario we
                 ;; don't move 2 lines down. We could, but we don't,
                 ;; since for certain commands this could cause the
                 ;; screen to inadvertently move
                 ;; i.e. `evics-bottom-of-screen'.
-                ((< evics--region-position line-number)
+                ((< evics--region-position cur-line-number)
                  (goto-line evics--region-position)
                  (set-mark (point))
-                 (goto-line line-number))))
+                 (goto-line cur-line-number))))
          ;; This captures the scenario where the cursor was past the
          ;; originally selected line (the above comment explains what
          ;; happens). So for this scenario we are just wanting to
          ;; restore the original line selection.
-         ((and (= evics--region-position line-number)
-               (> evics--previous-line-number evics--region-position))
+         ((and (= evics--region-position cur-line-number)
+               (> prev-line-number evics--region-position))
           (call-interactively 'evics-select-line)
-          (forward-line -1))))))
+          (forward-line -1))
+         ;; If were just marking the last line in the buffer then we
+         ;; don't want to skip up 2 lines. I.e, _ being the cursor:
+         ;;    prevLine
+         ;;    lastLine_
+         ;; After:
+         ;;   _prevLine
+         ;;   lastLine
+         ;; This would cause the previous line to also be unmarked.
+         ((and (= evics--previous-position (point-max))
+               (= (1- max-line-number) cur-line-number))
+          (forward-line 1)
+          ;; If the last line is a blank line then we can't go forward
+          ;; because we will enter a perpetual loop.
+          (when (= (point) (point-max))
+            (forward-line -1))))
+        ;; If we reach the last line in a buffer we will goto the end
+        ;; of the line, we do this so we can mark the whole line even
+        ;; if there is no newline. For example:
+        ;; ^   This is the last line$
+        ;; Without this check the point would be at ^ and not marking
+        ;; the whole line. And we can't go down a line to extend the
+        ;; region to include this line since this is the last line.
+        (if (and (= cur-line-number max-line-number)
+                 (= prev-line-number max-line-number))
+            (end-of-line)))))
 
 (defun evics-visual-deactivate-mark-hook ()
   "This function is invoked when we deactivate the mark. It's
