@@ -47,8 +47,14 @@ lines."
   (if (and (boundp evics-visual-mode)
            evics-visual-mode)
       (let ((cur-line-number (line-number-at-pos))
-            (prev-line-number (line-number-at-pos evics--previous-position))
-            (max-line-number (line-number-at-pos (point-max))))
+            (max-line-number (line-number-at-pos (point-max)))
+            prev-line-number)
+        ;; If we move the point to the end of the buffer and delete,
+        ;; then the invokation to line-number-at-pos would fail since
+        ;; the pos is out of bounds.
+        (if (> evics--previous-position (point-max))
+            (setq prev-line-number (1+ max-line-number))
+          (setq prev-line-number (line-number-at-pos evics--previous-position)))
         (beginning-of-line)
         (cond
          ;; This catches the case where we are moving down and are
