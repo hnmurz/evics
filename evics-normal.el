@@ -70,7 +70,7 @@ beginning of sexp"
   (save-excursion
     (join-line t)))
 
-(defun evics-backward-WORD ()
+(defun evics-backward-WORD (&optional arg)
   "Skip backwards over a WORD. evics-WORD was defined with
 `define-thing-chars', and this macro does not seem to assign a
 forward op. So this method uses a makeshift forward op."
@@ -86,7 +86,7 @@ forward op. So this method uses a makeshift forward op."
     (left-char))
   (beginning-of-thing 'evics-WORD))
 
-(defun evics-forward-WORD ()
+(defun evics-forward-WORD (&optional arg)
   "Skip over a WORD. evics-WORD was defined with
 `define-thing-chars', and this macro does not seem to assign a
 forward op. So this method uses a makeshift forward op."
@@ -219,6 +219,12 @@ anzu installed. If not then invoke `regexp-replace'"
   ;; another possible backend, perhaps anzu.
   (cond ((require 'visual-regexp nil t) (call-interactively 'vr/replace))
         (t (call-interactively 'replace-regexp))))
+
+(defun evics-write-buffer-quit-all ()
+  "Save current buffer and then exit emacs, equivalent to :qa in vim."
+  (interactive)
+  (save-buffer)
+  (save-buffers-kill-terminal))
 
 (defun evics-toggle-kbd-macro ()
   "Start or end kbd macro recording."
@@ -380,6 +386,7 @@ of unused default keybindings that might clobber evics bindings.")
       '(("w" save-buffer)
         ("W" save-buffer)
         ("q" kill-buffer)
+        ("wqa" evics-write-buffer-quit-all)
         ("Q" save-buffers-kill-terminal)
         ("o" delete-other-windows)
         ("e" find-file)

@@ -256,5 +256,12 @@ first 5 indices are reserved for evics."
   (add-to-ordered-list 'evics--emulation-maps arg index))
 
 (add-to-list 'emulation-mode-map-alists 'evics--emulation-maps)
+;;; In order to properly preserve keeping the horizontal position we
+;;; will invoke set-goal-column after any horizontal movement command.
+;(defun evics-set-goal-column (&rest args)
+;  "The original set-goal-column outputs an annoying message each time"
+;  (setq goal-column (current-column)))
+;(advice-add 'set-goal-column :override #'evics-set-goal-column)
+;(add-hook 'post-command-hook 'set-goal-column)
 
 (provide 'evics)
